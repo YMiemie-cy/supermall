@@ -24,7 +24,9 @@ export default {
   },
   methods: {
     tabclick(index) {
-      this.currentIndex = index
+      this.currentIndex = index;
+      // 传出数据 自定义事件
+      this.$emit('tabClick',index)
     }
   }
 }

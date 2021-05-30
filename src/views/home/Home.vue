@@ -4,8 +4,8 @@
     <home-swiper :banners="banners"></home-swiper>
     <recommend-view :recommends="recommends"></recommend-view>
     <feature-view></feature-view>
-    <tab-control :titles="['流行','新款','精选']"></tab-control>
-
+    <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
+    <goods-list :goods="showGoods" ></goods-list>
     <ul>
       <li></li>
       <li></li>
@@ -43,10 +43,12 @@
 // 公共组件
   import NavBar from "components/common/navbar/NavBar"
   import TabControl from 'components/content/tabControl/TabControl'
+  import GoodsList from 'components/content/goods/GoodsList'
 
 
 // 路由
   import { getHomeMultidata, getHomeGoods } from "network/home"
+
 
   export default {
 		name: "Home",
@@ -55,7 +57,8 @@
       RecommendView,
       FeatureView,
       NavBar,
-      TabControl 
+      TabControl,
+        GoodsList 
     },
     data() {
       return {
@@ -65,7 +68,13 @@
           'pop': {page: 0, list: []},
           'new': {page: 0, list: []},
           'sell': {page: 0, list: []}
-        }
+        },
+        Nowindex: 'pop'
+      }
+    },
+    computed: {
+      showGoods(){
+        return this.goods[this.Nowindex].list
       }
     },
     created() {
@@ -78,6 +87,25 @@
      this.getHomeGoods('sell')
     },
     methods: {
+// 事件监听相关方法
+      tabClick(index){
+        switch(index){
+          case 0:
+            this.Nowindex = 'pop'
+          break
+          case 1:
+            this.Nowindex = 'new'
+          break
+          case 2:
+            this.Nowindex = 'sell'
+          break
+        }
+      }, 
+
+
+
+
+      // 网络请求相关方法
       getHomeMultidata(){
         getHomeMultidata().then(res => {
         // 保证数据不被销毁,新接口上新加了一层data
@@ -89,7 +117,7 @@
         const page = this.goods[type].page + 1
         getHomeGoods(type, page).then(res => {
           // 按顺序导入元素入数组方法
-          this.goods[type].list.push(...res.data.list)
+          this.goods[type].list.push(...res.data.data.list)
           this.goods[type].page += 1
           })
       }
@@ -115,6 +143,9 @@
   }
   .tab-control{
     position: sticky;
-    top: 44 ;
+    top: 44px;
+    background-color: #fff;
+
+    z-index: 9;
   }
 </style>
