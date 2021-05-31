@@ -1,35 +1,20 @@
 <template>
-  <div id="home">
+  <div id="home" class="wrapper">
     <nav-bar class="home-nav"><div slot="center">购物车</div></nav-bar>
-    <home-swiper :banners="banners"></home-swiper>
-    <recommend-view :recommends="recommends"></recommend-view>
-    <feature-view></feature-view>
-    <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
-    <goods-list :goods="showGoods" ></goods-list>
-    <ul>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
+
+    <scroll class="content" 
+            ref="scroll"@scroll="contentScroll"
+            @pullingUp="loadMore"
+            :pull-up-load="true"
+            :probe-type="3">
+      <home-swiper :banners="banners"></home-swiper>
+      <recommend-view :recommends="recommends"></recommend-view>
+      <feature-view></feature-view>
+      <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
+      <goods-list :goods="showGoods" ></goods-list>
+    </scroll>
+
+    <back-top @backTop="backTop" />
 
   </div>
 </template>
@@ -44,10 +29,13 @@
   import NavBar from "components/common/navbar/NavBar"
   import TabControl from 'components/content/tabControl/TabControl'
   import GoodsList from 'components/content/goods/GoodsList'
+  import Scroll from 'components/common/scroll/Scroll.vue'
+  import BackTop from 'components/content/backTop/BackTop.vue'
 
 
 // 路由
   import { getHomeMultidata, getHomeGoods } from "network/home"
+
 
 
   export default {
@@ -58,7 +46,9 @@
       FeatureView,
       NavBar,
       TabControl,
-        GoodsList 
+        GoodsList,
+        Scroll,
+        BackTop 
     },
     data() {
       return {
@@ -101,8 +91,19 @@
           break
         }
       }, 
+      contentScroll(position) {
+		    // 1.决定tabFixed是否显示
+        this.isTabFixed = position.y < -this.tabOffsetTop
 
-
+        // 2.决定backTop是否显示
+        this.showBackTop = position.y < -BACKTOP_DISTANCE
+      },
+      loadMore() {
+		    this.getHomeProducts(this.currentType)
+      },
+      backTop() {
+        this.$refs.scroll.scrollTo(0, 0, 300)
+      },
 
 
       // 网络请求相关方法
@@ -129,6 +130,7 @@
   #home{
     /* position: sticky; */
     padding-top: 44px;
+    position: relative;
   }
 /* 对于在不同页面有区别的样式在具体定义 */
   .home-nav{
@@ -147,5 +149,14 @@
     background-color: #fff;
 
     z-index: 9;
+  }
+  .content{
+    position: absolute;
+    /* overflow: hidden; */
+    top: 44px;
+    bottom: 49px;
+    left: 0;
+    right: 0;
+
   }
 </style>

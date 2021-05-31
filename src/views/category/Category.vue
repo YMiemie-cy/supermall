@@ -121,7 +121,7 @@ import BScroll from 'better-scroll'
     },
     mounted() {
       this.scroll = new BScroll(document.querySelector('.wrapper'),{
-
+        probeType: 3 
       })
     }
 	}
