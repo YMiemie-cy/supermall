@@ -1,20 +1,23 @@
 <template>
   <div id="home" class="wrapper">
-    <nav-bar class="home-nav"><div slot="center">购物车</div></nav-bar>
+    <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
 
     <scroll class="content" 
             ref="scroll"@scroll="contentScroll"
             @pullingUp="loadMore"
             :pull-up-load="true"
             :probe-type="3">
+
       <home-swiper :banners="banners"></home-swiper>
       <recommend-view :recommends="recommends"></recommend-view>
       <feature-view></feature-view>
       <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
       <goods-list :goods="showGoods" ></goods-list>
+    
     </scroll>
+            
 
-    <back-top @backTop="backTop" />
+    <!-- <back-top @backTop="backTop" /> -->
 
   </div>
 </template>
@@ -96,10 +99,11 @@
         this.isTabFixed = position.y < -this.tabOffsetTop
 
         // 2.决定backTop是否显示
-        this.showBackTop = position.y < -BACKTOP_DISTANCE
+        // this.showBackTop = position.y < -BACKTOP_DISTANCE
       },
       loadMore() {
-		    this.getHomeProducts(this.currentType)
+        // console.log('上拉加载更多')
+		    this.getHomeGoods(this.currentType)
       },
       backTop() {
         this.$refs.scroll.scrollTo(0, 0, 300)
@@ -120,8 +124,21 @@
           // 按顺序导入元素入数组方法
           this.goods[type].list.push(...res.data.data.list)
           this.goods[type].page += 1
+          
+          // 完成上拉加载更多
+          this.$refs.scroll.finishPullUp()
           })
-      }
+
+      },
+      // getHomeProducts(type) {
+      //   getHomeData(type, this.goodsList[type].page).then(res => {
+      //     const goodsList = res.data.list;
+      //     this.goodsList[type].list.push(...goodsList)
+      //     this.goodsList[type].page += 1
+
+      //     this.$refs.scroll.finishPullUp()
+      //   })
+      // }
 	}
 }
 </script>

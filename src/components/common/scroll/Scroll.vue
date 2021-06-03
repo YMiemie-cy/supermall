@@ -2,7 +2,7 @@
 // ref绑定在组件中，那么通过this.$refs.refname获得的是一个的是一个组件对象
 // ref绑定在普通元素中，那么通过this.$refs.refname获得的是一个的是一个元素对象
 <template>
-  <div class="wrapper">
+  <div class="wrapper" ref="wrapper">
     <div class="content">
       <slot></slot>
     </div>
@@ -10,7 +10,14 @@
 </template>
 
 <script>
-import BScroll from 'better-scroll'
+import BScroll from '@better-scroll/core'
+
+import Pullup from '@better-scroll/pull-up'
+BScroll.use(Pullup)
+import ObserveDOM from '@better-scroll/observe-dom'
+BScroll.use(ObserveDOM)
+import ObserveImage from '@better-scroll/observe-image'
+BScroll.use(ObserveImage)
 
 export default {
   name: "Scroll",
@@ -46,15 +53,19 @@ export default {
         this.scroll = new BScroll(this.$refs.wrapper, {
           probeType: this.probeType,
           click: true,
-          pullUpLoad: this.pullUpLoad
+          pullUpLoad: this.pullUpLoad,
+          observeDOM: true,
+          observeImage: true
         })
+        
 
-        // 2.将监听事件回调
-        this.scroll.on('scroll', pos => {
-          this.$emit('scroll', pos)
+        // 3.监听滚动的位置
+        if(this.probeType === 2 || this.probeType === 3){
+          this.scroll.on('scroll', position => {
+          this.$emit('scroll', position)
         })
-
-        // 3.监听上拉到底部
+        }
+        // 4.监听上拉到底部
         this.scroll.on('pullingUp', () => {
           console.log('上拉加载');
           this.$emit('pullingUp')
